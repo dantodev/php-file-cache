@@ -9,6 +9,7 @@ class CacheElement
   private $_lifetime;
   private $_start;
   private $_refresh;
+  private $_is_written;
   private $_modified;
 
   /**
@@ -28,6 +29,7 @@ class CacheElement
     $this->_lifetime = $lifetime;
     $this->_start = $start ?: time();
     $this->_refresh = $refresh;
+    $this->_is_written = $start !== null;
     $this->_modified = $start === null;
   }
 
@@ -56,6 +58,11 @@ class CacheElement
     return $this->_value;
   }
 
+  public function getLifeTime()
+  {
+    return $this->_lifetime;
+  }
+
   /**
    *
    */
@@ -69,6 +76,7 @@ class CacheElement
        "refresh" => $this->_refresh,
      ]));
     }
+    $this->_is_written = true;
     $this->_modified = false;
   }
 
@@ -77,7 +85,10 @@ class CacheElement
    */
   public function removeFromFs()
   {
-    return unlink($this->path());
+    if ($this->_is_written) {
+      return unlink($this->path());
+    }
+    return true;
   }
 
   /**

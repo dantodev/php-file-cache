@@ -108,7 +108,7 @@ class CacheElement
      */
     public function isAlive()
     {
-        return (time() - $this->_start) <= $this->_lifetime;
+        return $this->_lifetime == -1 || (time() - $this->_start) <= $this->_lifetime;
     }
 
     /**

@@ -68,11 +68,7 @@ class Cache
         if (is_null($element = $this->getOrFetchCacheElement($key))) {
             $this->_cache[$key] = $this->newCacheElement($key, $value, $lifetime, $refresh);
         } else {
-            $element->update(
-                $value,
-                $lifetime ?: $element->getLifetime(),
-                $refresh ?: $this->_default_refresh
-            );
+            $element->update($value, $lifetime, $refresh);
         }
         return $this;
     }
@@ -92,17 +88,17 @@ class Cache
 
     /**
      * @param $key
-     * @param \Closure $call
+     * @param callable $call
      * @param int|null $lifetime
      * @param bool|null $refresh
      * @return $this
      */
-    public function remember($key, \Closure $call, $lifetime = null, $refresh = null)
+    public function remember($key, callable $call, $lifetime = null, $refresh = null)
     {
         if (!$this->has($key)) {
             $this->_cache[$key] = $this->newCacheElement($key, $call(), $lifetime, $refresh);
         }
-        return $this;
+        return $this->get($key);
     }
 
     /**

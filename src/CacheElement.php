@@ -38,12 +38,16 @@ class CacheElement
      * @param int $lifetime
      * @param bool $refresh
      */
-    public function update($value, $lifetime = 60, $refresh = false)
+    public function update($value, $lifetime = null, $refresh = null)
     {
         $this->_value = (string)$value;
-        $this->_lifetime = $lifetime;
+        if (!is_null($lifetime)) {
+            $this->_lifetime = $lifetime;
+        }
+        if (!is_null($refresh)) {
+            $this->_refresh = $refresh;
+        }
         $this->_start = time();
-        $this->_refresh = $refresh;
         $this->_modified = true;
     }
 
@@ -58,9 +62,17 @@ class CacheElement
         return $this->_value;
     }
 
+    /**
+     * @return int
+     */
     public function getLifeTime()
     {
         return $this->_lifetime;
+    }
+
+    public function getRefresh()
+    {
+        return $this->_refresh;
     }
 
     /**

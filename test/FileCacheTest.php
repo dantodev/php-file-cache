@@ -30,13 +30,12 @@ class FileCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($cache->get("foo"));
 
         // test remember
-        $cache->remember("foo2", function () {
+        $this->assertEquals("bar2", $cache->remember("foo2", function () {
             return "bar2";
-        });
-        $cache->remember("foo2", function () {
+        }));
+        $this->assertEquals("bar2", $cache->remember("foo2", function () {
             return "this will never be set";
-        });
-        $this->assertEquals("bar2", $cache->get("foo2"));
+        }));
 
         // test timeout
         $cache->set("foo3", "bar3", 1);

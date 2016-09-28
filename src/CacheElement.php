@@ -24,8 +24,8 @@ class CacheElement
     public function __construct(Cache $cache_instance, $key, $value, $lifetime = 60, $start = null, $refresh = false)
     {
         $this->_cache_instance = $cache_instance;
-        $this->_key = (string)$key;
-        $this->_value = (string)$value;
+        $this->_key = (string) $key;
+        $this->_value = $value;
         $this->_lifetime = $lifetime;
         $this->_start = $start ?: time();
         $this->_refresh = $refresh;
@@ -40,7 +40,7 @@ class CacheElement
      */
     public function update($value, $lifetime = null, $refresh = null)
     {
-        $this->_value = (string)$value;
+        $this->_value = $value;
         if (!is_null($lifetime)) {
             $this->_lifetime = $lifetime;
         }
@@ -82,7 +82,7 @@ class CacheElement
     {
         if ($this->_modified) {
             file_put_contents($this->path(), json_encode([
-                "value" => $this->_value,
+                "value" => serialize($this->_value),
                 "lifetime" => $this->_lifetime,
                 "start" => $this->_start,
                 "refresh" => $this->_refresh,

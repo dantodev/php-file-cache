@@ -177,7 +177,7 @@ class Cache
             $element = new CacheElement(
                 $this,
                 $key,
-                $cache["value"],
+                unserialize($cache["value"]),
                 $cache["lifetime"],
                 $cache["start"],
                 $cache["refresh"]

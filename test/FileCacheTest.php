@@ -3,56 +3,72 @@
 class FileCacheTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function test()
+    /** @var Cache */
+    private $cache;
+    
+    public function setUp()
     {
-        $cache = new Cache(__DIR__ . "/test_path/");
+        $this->cache = new Cache(__DIR__ . "/test_path/");
+        parent::setUp();
+    }
+    
+    public function testGetHasEmpty()
+    {
+        $this->assertNull($this->cache->get("foo"));
+        $this->assertEquals("default", $this->cache->get("foo", "default"));
+        $this->assertFalse($this->cache->has("foo"));
+    }
 
-        // get if not set
-        $this->assertNull($cache->get("foo"));
-        $this->assertEquals("default", $cache->get("foo", "default"));
-
-        // test has = false
-        $this->assertFalse($cache->has("foo"));
-
-        // set & get if set
-        $cache->set("foo", "bar");
-        $this->assertEquals("bar", $cache->get("foo"));
-
-        // test has = true
-        $this->assertTrue($cache->has("foo"));
+    public function testGetHasExisting()
+    {
+        $this->cache->set("foo", "bar");
+        $this->assertEquals("bar", $this->cache->get("foo"));
+        $this->assertTrue($this->cache->has("foo"));
 
         //test if cache has been written
-        $cache->writeCache()->flush(true);
-        $this->assertEquals("bar", $cache->get("foo"));
+        $this->cache->writeCache()->flush(true);
+        $this->assertEquals("bar", $this->cache->get("foo"));
+    }
 
-        // test remove
-        $cache->forget("foo");
-        $this->assertNull($cache->get("foo"));
+    public function testRemove()
+    {
+        $this->cache->set("foo", "bar");
+        $this->assertEquals("bar", $this->cache->get("foo"));
+        $this->cache->forget("foo");
+        $this->assertNull($this->cache->get("foo"));
+    }
 
-        // test remember
-        $this->assertEquals("bar2", $cache->remember("foo2", function () {
+    public function testRemember()
+    {
+        $this->assertEquals("bar2", $this->cache->remember("foo2", function () {
             return "bar2";
         }));
-        $this->assertEquals("bar2", $cache->remember("foo2", function () {
+        $this->assertEquals("bar2", $this->cache->remember("foo2", function () {
             return "this will never be set";
         }));
+    }
 
+    public function testTimeout()
+    {
         // test timeout
-        $cache->set("foo3", "bar3", 1);
+        $this->cache->set("foo3", "bar3", 1);
         sleep(2);
-        $this->assertNull($cache->get("foo3"));
+        $this->assertNull($this->cache->get("foo3"));
 
         // test refresh
-        $cache->set("foo4", "bar4", 4);
+        $this->cache->set("foo4", "bar4", 4);
         sleep(2);
-        $this->assertEquals("bar4", $cache->get("foo4"));
+        $this->assertEquals("bar4", $this->cache->get("foo4"));
         sleep(2);
-        $this->assertEquals("bar4", $cache->get("foo4"));
+        $this->assertEquals("bar4", $this->cache->get("foo4"));
         sleep(5);
-        $this->assertNull($cache->get("foo4"));
+        $this->assertNull($this->cache->get("foo4"));
+    }
 
-        // test flush
-        $cache->flush();
+    public function testSerialization()
+    {
+        $this->cache->set('foo4', ['item1', 'item2']);
+        $this->assertEquals(['item1', 'item2'], $this->cache->get('foo4'));
     }
 
 }
